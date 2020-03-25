@@ -46,7 +46,8 @@ def create_app():
 
     all_cities = list()
     with open(config.all_cities_file, "r", encoding='utf-8') as f:
-        all_cities = f.readlines()
+        for line in f:
+            all_cities.append(line.strip())
 
     cities_synonyms = dict()
     with open(config.cities_synonyms, "r", encoding='utf-8') as f:
