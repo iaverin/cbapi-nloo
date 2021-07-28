@@ -1,4 +1,4 @@
-from fuzzywuzzy import process
+from fuzzywuzzy import process, fuzz
 
 global config
 
@@ -47,23 +47,25 @@ def detect_city(message, threshold, all_cities: list = None, synonyms_list: list
     syn_inverted_dict = syn_inverted_dict or _syn_inverted_dict
 
     # step 1: check synonyms first
-    cities_from_synonyms = process.extractBests(message, synonyms_list, limit=3, score_cutoff=threshold)
+    # cities_from_synonyms = process.extractBests(message, synonyms_list, limit=3, score_cutoff=threshold)
 
-    if len(cities_from_synonyms) == 0:
-        cities_from_synonyms.append(("", 0))
+    # if len(cities_from_synonyms) == 0:
+    #     cities_from_synonyms.append(("", 0))
 
-    if cities_from_synonyms[0][1] == 100:
-        if cities_from_synonyms[0][0] in syn_inverted_dict:
-            return syn_inverted_dict[cities_from_synonyms[0][0]], cities_from_synonyms[0][1]
+    # if cities_from_synonyms[0][1] == 100:
+    #     if cities_from_synonyms[0][0] in syn_inverted_dict:
+    #         return syn_inverted_dict[cities_from_synonyms[0][0]], cities_from_synonyms[0][1]
 
     # step 2: check all cities
-    cities_from_all = process.extractBests(message, all_cities, limit=3, score_cutoff=threshold)
+    cities_from_all = process.extractBests(message, all_cities, limit=3, scorer=fuzz.UWRatio, score_cutoff=threshold)
 
     if len(cities_from_all) == 0:
         cities_from_all.append(("", 0))
 
     if cities_from_all[0][1] == 100:
         return cities_from_all[0]
+
+    return cities_from_all[0]
 
     if 0 < cities_from_all[0][1] >= cities_from_synonyms[0][1]:
         return cities_from_all[0]
